@@ -2,6 +2,7 @@ package googleAuthIDTokenVerifier
 
 import (
 	"crypto/rsa"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"math/big"
@@ -42,7 +43,11 @@ func getFederatedSignonCerts() (*Certs, error) {
 			return certs, nil
 		}
 	}
-	resp, err := http.Get(googleOAuth2FederatedSignonCertsURL)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	resp, err := client.Get(googleOAuth2FederatedSignonCertsURL)
 	if err != nil {
 		return nil, err
 	}
